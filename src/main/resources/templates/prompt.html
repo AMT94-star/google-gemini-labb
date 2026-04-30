@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/style.css}">
     <title>Gemini questions and answers</title>
 </head>
 <body>
@@ -17,6 +18,13 @@
 
     <h2>Answer</h2>
     <p th:text="${answer}"></p>
+</div>
+
+<h2>Previous Questions</h2>
+<div th:each="item : ${history}">
+    <p><b>Question</b> <span th:text="${item.question}"></span></p>
+    <p><b>Answer</b> <span th:text="${item.answer}"></span></p>
+    <hr>
 </div>
 
 </body>
