@@ -1,11 +1,12 @@
 package se.amt.googlegeminilabb.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Map;
 @Service
 public class GeminiService {
 
-    public String ask(@RequestParam String prompt) {
+    public String ask(String prompt) {
         String api = System.getenv("GOOGLE_API_KEY");
 
         String url =
@@ -40,6 +41,24 @@ public class GeminiService {
         ResponseEntity<String> response =
                 restTemplate.postForEntity(url, request, String.class);
 
-        return response.getBody();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.getBody());
+
+            String answer = root
+                    .path("candidates")
+                    .get(0)
+                    .path("content")
+                    .path("parts")
+                    .get(0)
+                    .path("text")
+                    .asText();
+
+            return answer.replace("**", "")
+                    .replace("*", "");
+
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 }
